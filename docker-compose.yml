@@ -1,0 +1,22 @@
+version: '2.1'
+
+# Yorango eventually only had one Compose file for all services, so this was
+# actually one directory up, with the front-end in the static/ directory.
+# Config for other services has been removed for OSS purposes
+
+volumes:
+  # use a named volume for node_modules so it doesn't have to be recreated
+  # every time the static service runs
+  node_modules:
+
+services:
+  static:
+    build: ./static/
+    image: yorango_static
+    volumes:
+      - ./static:/code
+      - ./core/django/public/build:/code/build # nginx serves build artifacts
+      # don't mount node_modules to host directory (only exists in container)
+      - node_modules:/code/node_modules
+    depends_on:
+      - core # make sure the back end is running first!
